@@ -4,13 +4,13 @@ function Form(form) {
     var checkUser = function() {
       var savedUser = JSON.parse(localStorage.getItem('current_user'));
 
-      if( savedUser ) {
+      if(savedUser) {
         alert('User already saved');
         flag = confirm('Continue session ?');
 
         if(flag) {
           alert('Succses! (user redirect to another page)');
-          window.location.replace("http://stackoverflow.com");
+          window.location.replace("https://www.google.com.ua");
         } else {
           formActions();
         }
@@ -19,16 +19,17 @@ function Form(form) {
         formActions();
       }
     }
+    checkUser();
 
 
     //init actions
-    var formActions = function() {
+    function formActions() {
       setForm();
       catchSubmit();
     };
 
 
-    var setForm = function() {
+    function setForm() {
       if( !document.getElementById(form.id) && document.getElementById(form.id) == null ) {
         throw new Error('Error form id');
       } else {
@@ -38,7 +39,7 @@ function Form(form) {
     };
 
 
-    var catchSubmit = function() {
+    function catchSubmit() {
       currentForm.addEventListener('submit', function (e) {
         e.preventDefault();
          
@@ -70,16 +71,9 @@ function Form(form) {
       var localValue = JSON.parse(localStorage.getItem('current_user'));
       console.log('local value is: ' + localValue.name);
     };
-
-
-    //init form
-    function init() {
-      checkUser();
-    };
-    init();
 } 
 
-//calling plugin
+//calling
 var newForm = new Form({
   id: 'subscribe',
 });

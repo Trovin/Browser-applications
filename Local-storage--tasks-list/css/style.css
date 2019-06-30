@@ -1,0 +1,180 @@
+body * {
+     line-height: 1.2;
+     font-family: 'Helvetica', 'sans-serif';
+}
+
+a {
+     white-space: normal;
+}
+
+form {
+     width: 330px;
+     max-width: 100%;
+     margin: 0 auto;
+     text-align: center;
+}
+
+textarea {
+     resize: none;
+     height: 60px;
+}
+
+button,
+input,
+textarea {
+     white-space: normal;
+     border: 1px solid #f5f5f5;
+     font-weight: bold;
+     color: #636363;
+     width: 100%;
+     margin-bottom: 12px;
+     padding: 10px;
+     border-radius: 5px;
+     transition: 0.4s;
+     cursor: pointer;
+}
+
+input,
+textarea,
+input:required,
+textarea:required {
+     background-color: #fff;
+     line-height: 100%;
+     font-size: 14px;
+     font-weight: normal;
+}
+
+input::placeholder,
+textarea::placeholder {
+     color: #cacaca;
+     font-weight: normal;
+     line-height: 100%;
+     font-size: 14px;
+}
+
+select {
+     outline: none;
+}
+
+button, .btn {
+     display: inline-block;
+     white-space: normal;
+     border: 1px solid #f5f5f5;
+     font-weight: bold;
+     color: #636363;
+     width: 100%;
+     margin-bottom: 12px;
+     padding: 10px;
+     border-radius: 5px;
+     transition: 0.2s;
+     cursor: pointer;
+     text-transform: uppercase;
+     font-size: 12px;
+}
+
+.btn_control {
+     width: auto;
+     margin: 20px 0 20px 20px;
+}
+
+button:hover, .btn:hover {
+     background-color: #222;
+     color: #fff;
+}
+
+input:hover,
+textarea:hover {
+     border: 1px solid #ccc;
+}
+
+img {
+     border-radius: 5px;
+     margin-top: 10px;
+}
+
+.header,
+.footer {
+     text-align: center;
+     padding: 20px 0;
+     font-weight: bold;
+}
+
+.header h1 {
+     text-transform: uppercase;
+}
+
+.container {
+     max-width: 800px;
+     width: 100%;
+     margin: 50px auto;
+     padding: 15px;
+}
+
+.dashboard {
+     position: relative;
+     display: flex;
+     flex-wrap: wrap;
+     padding: 50px 0;
+     justify-content: space-between;
+     align-items: flex-start;
+}
+
+.dashboard-control {
+     width: 100%;
+     display: flex;
+     justify-content: flex-end;
+     align-items: flex-start;
+}
+
+/* task */
+.task-item, .task-item_active {
+     width: calc(50% - 15px);
+     max-width: 100%;
+     margin: 0 0 30px;
+     border-radius: 10px;
+     padding: 30px 20px 10px;
+     border: 1px solid #eaeaea;
+     transition: .4s;
+     position: relative;
+}
+
+.task-item:hover {
+     border: 1px solid #c7c7c7;
+     transform: scale(1.1);
+}
+
+.task-item_completed {
+     background-color: #90b5e0; 
+     color: #fff;
+}
+
+.task-title {
+     font-size: 20px;
+     font-weight: 700;
+     margin-bottom: 10px;
+}
+
+.task-description {
+     font-size: 18px;
+     margin-bottom: 10px;
+}
+
+.task-data {
+     font-size: 10px;
+     text-align: right;
+}
+
+.select-action {
+     position: absolute;
+     right: 5px;
+     top: 5px;
+     font-size: 12px;
+     border: 0;
+     padding: 5px 0;
+     border-radius: 5px;
+}
+
+.default-value {
+     display: none;
+}
+
