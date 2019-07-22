@@ -8,15 +8,16 @@ var View = function() {
     	item.className = 'task-item ' + 'task-item_' + task.status;	
     	item.setAttribute('id', task.id);
     	item.setAttribute('status', task.status);
-    	item.innerHTML = '<div class="task-title">' + task.title + '</div>' +
-    						  '<div class="task-description">' + task.description + '</div>' +
-    						  '<div class="task-data">' + task.date + '</div>' +
-    						  '<select class="select-action">' + 
-    						  	  '<option class="default-value" disabled="disabled" selected>' + task.status + '</option>' +
-    						  	  '<option>active</option>' +
-    						  	  '<option>completed</option>' +
-    						  	  '<option>remove</option>' +
-    						  '</select>';
+    	item.setAttribute('date', task.date);
+    	item.innerHTML =    '<div class="task-title">' + task.title + '</div>' +
+    						    '<div class="task-description">' + task.description + '</div>' +
+    						    '<div class="task-date">' + task.userDate + '</div>' +
+    						    '<select class="select-action">' + 
+    						  	    '<option class="default-value" disabled="disabled" selected>' + task.status + '</option>' +
+    						  	    '<option>active</option>' +
+    						  	    '<option>completed</option>' +
+    						  	    '<option>remove</option>' +
+    						    '</select>';
     	dashboard.append(item);
 	};
 
@@ -40,10 +41,11 @@ var View = function() {
 
 
 /* ---------------------------- Task ----------------------------- */
-var Task = function(title, description, date, id, status) {
+var Task = function(title, description, date, userDate, id, status) {
 	this.title = title;
 	this.description = description;
 	this.date = date;
+	this.userDate = userDate;
 	this.id = id;
 	this.status = status;
 }
@@ -64,50 +66,50 @@ var Model = function(View) {
 	}
 
 	this.setId = function() {
-		if(this.storage.length > 0) {
-			var id = JSON.parse(localStorage.getItem('id'));
+		if(_this.storage.length > 0) {
+			_this.id = JSON.parse(localStorage.getItem('id'));
 		} else {
 			localStorage.setItem('id', 0);
-			var id = JSON.parse(localStorage.getItem('id'));
+			_this.id = JSON.parse(localStorage.getItem('id'));
 		}
-		this.id = id;
 	}
 
 	this.loadView = function() {
-		this.view.render(this.storage);
+		_this.view.render(_this.storage);
 	}
 
 	function getDate() {
-		var today  = new Date();
+		var today = new Date();
 		var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		var date = today.getFullYear() + ', ' + monthNames[today.getMonth()] + ', ' + today.getDate();
 		return date;
 	};
 
 	this.createNewTask = function(taskData) {
-		this.id++; //increment id key
-		localStorage.setItem('id', JSON.stringify(this.id));
+		_this.id++; //increment id key
+		localStorage.setItem('id', JSON.stringify(_this.id));
 
-		var newTask = new Task(taskData.title, taskData.description, taskData.date = getDate(), taskData.id = this.id, taskData.status = 'active');
-		this.storage.push(newTask);
-     	localStorage.setItem('list', JSON.stringify(this.storage));
+		var newTask = new Task(taskData.title, taskData.description, taskData.date = new Date().getTime(), taskData.userDate = getDate(), taskData.id = _this.id, taskData.status = 'active');
+		_this.storage.push(newTask);
+     	localStorage.setItem('list', JSON.stringify(_this.storage));
 
 		_this.view.renderItem(newTask);
 	}
 
 	this.removeCurrentTask = function(el) {
+		console.log('status change');
 		var id = el.parentElement.getAttribute('id'); 
-		console.log(id);
 		_this.storage.forEach(function(item, index) {
     		if(item.id == id ) {
     			_this.storage.splice(index, 1);
     		}
     	});
-		localStorage.setItem('list', JSON.stringify(_this.storage));
+		localStorage.setItem('list', JSON.stringify(this.storage));
 		el.parentElement.remove(); //remove from DOM
 	}
 
 	this.completeCurrentTask = function(el) {
+		console.log('status change');
 		var id = el.parentElement.getAttribute('id'); 
 		_this.storage.forEach(function(item, index) {
     		if(item.id == id ) {
@@ -121,6 +123,7 @@ var Model = function(View) {
 	}
 
 	this.activateCurrentTask = function(el) {
+		console.log('status change');
 		var id = el.parentElement.getAttribute('id'); 
 		_this.storage.forEach(function(item, index) {
     		if(item.id == id ) {
@@ -135,53 +138,92 @@ var Model = function(View) {
 
 	this.removeAll = function(taskData) {
 		localStorage.setItem('id', 0);
-		this.storage = [];
+		_this.storage = [];
      	localStorage.clear();
 
 		_this.view.removeItems();
 	}
+
+	this.sortingTasks = function() {
+		_this.storage.sort(function(a, b) {
+		  return b.date - a.date;
+		});
+
+		localStorage.setItem('list', JSON.stringify(_this.storage));
+
+		_this.view.removeItems();
+		_this.view.render(_this.storage);
+	}
 }    
 
+
+/* ---------------------------- Event ----------------------------- */
+var Event = function(element, event, handler) {
+	element.addEventListener(event, handler, false);
+} 
 
 
 /* ---------------------------- Controller ----------------------------- */
 var Controller = function(Model) {
 	var _this = this;
-	this.model = Model;
+	this.form = document.getElementById('task');
+	this.removeBtn = document.getElementById('remove-all');
+	this.filterBtn = document.getElementById('filter-all');
 
+	this.model = Model;
     this.model.setStorage();
     this.model.setId();
     this.model.loadView();
 
-    this.handleSubmit = function(event) {
-    	event.preventDefault();
+    this.handleEvents = function() {
+    	new Event(_this.form, 'submit', addNew);
+    	new Event(_this.removeBtn, 'click', removeAll);
+    	new Event(_this.filterBtn, 'click', filterByDate);
+    	selectHandler();
+    }
+
+    function addNew(evt) {
+    	evt.preventDefault();
+    	var title = evt.target.querySelector('[name="task-title"]'),
+    		description = evt.target.querySelector('[name="task-description"]');
+
     	var taskData = {
-    		title: event.target.querySelector('[name="task-title"]').value,
-    		description: event.target.querySelector('[name="task-description"]').value
+    		title: title.value,
+    		description: description.value
     	}
+
+    	evt.target.reset(); //reset form
     	_this.model.createNewTask(taskData);
+    	selectHandler();
     };
 
-    this.handleSelect = function(event) {
-    	event.preventDefault();
-    	var selectValue = event.target.value;
-
-    	if(selectValue === 'remove') {
-    		console.log('Remove task');
-    		_this.model.removeCurrentTask(event.target);	
-    	} 
-    	if(selectValue === 'completed') {
-    		console.log('Completed task');
-    		_this.model.completeCurrentTask(event.target);	
-    	} else {
-    		console.log('Activated task');
-    		_this.model.activateCurrentTask(event.target);	
-    	}
-    };
-
-
-    this.handleClick = function(event) {
+    function removeAll() {
     	_this.model.removeAll();
+    };
+
+    function filterByDate() {
+    	_this.model.sortingTasks();
+    	selectHandler();
+    };
+
+
+    function selectHandler() {
+    	var select = document.getElementsByClassName('select-action');
+    	Object.values(select).forEach(function(item) {
+			new Event(item, 'change', selectStatus);
+		});
+    }
+
+    function selectStatus(evt) {
+    	evt.preventDefault();
+    	if(evt.target.value === 'remove') {
+    		_this.model.removeCurrentTask(evt.target);	
+    	} 
+    	if(evt.target.value === 'completed') {
+    		_this.model.completeCurrentTask(evt.target);	
+    	} else {
+    		_this.model.activateCurrentTask(evt.target);	
+    	}
     };
  };
 
@@ -190,38 +232,11 @@ var Controller = function(Model) {
 var app = {
 	controller: new Controller(new Model(new View())),
 	init: function() {
-		this.main(),
-		this.event.selectStatus();
-		this.event.addNew();
-		this.event.removeAll();
+		this.loader();
+		this.controller.handleEvents();
 	},
-	main: function() {
+	loader: function() {
 		//add libs
-	},
-	event: {
-		selectStatus: function() {
-			var taskAction = document.getElementsByClassName('select-action');
-			Object.values(taskAction).forEach(function(item) {
-			    item.onchange = function(event) {
-					app.controller.handleSelect(event);
-				}
-			});
-		},
-		addNew: function() {
-			var form = document.getElementById('task');
-			form.onsubmit = function(event) {
-				app.controller.handleSubmit(event);
-				app.event.selectStatus();
-			};
-		},
-		removeAll: function() {
-			var form = document.getElementById('remove-all');
-			form.onclick = function() {
-				app.controller.handleClick(event);
-			};
-		}
 	}
-
 }
 app.init();
-
